@@ -1,0 +1,39 @@
+% Motor constants
+R1 = 0.641;   X1 = 1.106;
+R2 = 0.332;   X2 = 0.464;
+Xm = 26.3;
+Vph = 460 / sqrt(3);    % Phase voltage
+ns = 1800;              % Synchronous speed (rpm)
+ws = 2 * pi * ns / 60;  % Synchronous speed (rad/s)
+
+% Thevenin equivalent
+Zth = 1i*Xm * (R1 + 1i*X1) / (1i*Xm + R1 + 1i*X1);
+Vth = abs(Vph * (1i*Xm / (R1 + 1i*X1 + 1i*Xm)));
+Rth = real(Zth);   Xth = imag(Zth);
+
+% Slips and speed
+s = linspace(0.001, 1, 51);
+n = (1 - s) * ns;
+
+% Torque for original R2
+T1 = 3 * Vth^2 * R2 ./ (ws * s .* ((Rth + R2 ./ s).^2 + (Xth + X2)^2));
+
+% Torque for doubled R2
+R2_double = 2 * R2;
+T2 = 3 * Vth^2 * R2_double ./ (ws * s .* ((Rth + R2_double ./ s).^2 + (Xth + X2)^2));
+
+% Torque for halved R2
+R2_half = 0.5 * R2;
+T3 = 3 * Vth^2 * R2_half ./ (ws * s .* ((Rth + R2_half ./ s).^2 + (Xth + X2)^2));
+
+% Plotting
+figure;
+plot(n, T1, 'b-', 'LineWidth', 2); hold on;
+plot(n, T2, 'r--', 'LineWidth', 2);
+plot(n, T3, 'g-.', 'LineWidth', 2);
+
+xlabel('Rotor Speed (rpm)', 'FontWeight', 'bold');
+ylabel('Torque (Nm)', 'FontWeight', 'bold');
+title('Torque-Speed Characteristic for Different R_2', 'FontWeight', 'bold');
+legend('Original R_2', 'Doubled R_2', 'Halved R_2');
+grid on;
