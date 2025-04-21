@@ -1,0 +1,35 @@
+% M-file, mag_field.m
+% M-file to calculate the net magnetic field produced
+% by a three-phase stator.
+% Set up the basic conditions
+bmax = 1; % Normalize bmax to 1
+freq = 100; % 60 Hz
+w = 2 * pi * freq; % angular velocity (rad/s)
+% First, generate the three component magnetic fields
+t = [0:1/6000:1/60]; % Time vector from 0 to 1/60 with step 1/6000
+o = 0; % Angle offset, set to 0 for simplicity
+Baa = sin(w * t) .* (cos(0) + 1i * sin(0));
+Ebb = sin(w * t - 2*pi / 3) .* (cos(2*pi / 3) + 1i * sin(2*pi / 3));
+Ecc = sin(w * t + 2* pi / 3) .* (cos(-2 * pi / 3) + 1i * sin(-2 * pi / 3));
+
+% Calculate Enet
+Enet = Baa + Ebb + Ecc;
+Bloop =(cos(w*t+0) + 1i * sin(w*t+0));
+
+% Calculate a circle representing the expected maximum value of Enet
+circle = 1.5 * (cos(w * t) + 1i * sin(w * t));
+
+% Plot the magnitude and direction of the resulting magnetic fields.
+% Note that Baa is black, Ebb is blue, Ecc is magenta, and Enet is red.
+for ii = 1:length(t)
+    % Plot the reference circle
+    plot(circle, 'k');
+    hold on;
+    % Plot the net magnetic field
+    plot([0 real(Enet(ii))], [0 imag(Enet(ii))], 'r', 'LineWidth', 3);
+    plot([0 real(Bloop(ii))], [0 imag(Bloop(ii))], 'r', 'LineWidth', 3);
+    axis square;
+    axis([-2 2 -2 2]);
+    drawnow;
+    hold off;
+end
